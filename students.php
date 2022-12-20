@@ -1,4 +1,6 @@
-<?php include "header.php"; ?>
+<div class="flex flex-col h-screen">
+<div><?php include "header.php"; ?></div>
+<div class="flex-grow">
 <?php
 include_once 'database.php';
 
@@ -57,9 +59,9 @@ while($row = mysqli_fetch_array($student)) {
 </tr>
 <?php
 $i++;
-}
-echo "Database row count: " . $rowcount;
-echo "Number of rows: " . $i;
-?>
+}?>
+<div class="w-[100%] text-center text-xl bg-sky-800 py-4 text-stone-100"><?php echo "Number of students: " . $rowcount; ?></div>
 </table>
-<?php @ require_once ("footer.php"); ?>
+</div>
+<div><?php @ require_once ("footer.php"); ?></div>
+</div>

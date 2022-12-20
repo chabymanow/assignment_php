@@ -125,16 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css" />
-</head>
-<body>
 
 <?php
     
@@ -147,35 +137,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             $courseData[] = $row;
         }
     ?>
-    <form action="addStudent.php" method="POST">
-        <h1>Add new student</h1>
+    
+    <div class="w-[100%] flex justify-center items-center mb-6">
+    <div class="w-[30%] h-fit items-center bg-sky-500 rounded-2xl py-10 px-5 border-1 shadow-lg">
+
+    <form class="flex flex-col gap-0.5" action="addStudent.php" method="POST">
+        <h1 class="text-center text-4xl font-bold">Add new student</h1>
         <label for="student_id">Student ID</label>
-        <span class="error"> <?php echo $studentIdErr;?></span><br>
-        <input type="text" name="student_id" id="student_id" value=<?php echo $student_id ?>></br>
+        <span class="text-red-600 text-sm font-bold"> <?php echo $studentIdErr;?></span><br>
+        <input class="rounded-md" type="text" name="student_id" id="student_id" value=<?php echo $student_id ?>></br>
 
         <label for="first_name">First name</label>
-        <span class="error"> <?php echo $firstNameErr;?></span><br>
-        <input type="text" name="first_name" id="first_name" value=<?php echo $first_name ?>></br>
+        <span class="text-red-600 text-sm font-bold"> <?php echo $firstNameErr;?></span><br>
+        <input class="rounded-md" type="text" name="first_name" id="first_name" value=<?php echo $first_name ?>></br>
 
         <label for="last_name">Last name</label>
-        <span class="error"> <?php echo $lastNameErr;?></span><br>
-        <input type="text" name="last_name" id="last_name" value=<?php echo $last_name ?>></br>
+        <span class="text-red-600 text-sm font-bold"> <?php echo $lastNameErr;?></span><br>
+        <input class="rounded-md" type="text" name="last_name" id="last_name" value=<?php echo $last_name ?>></br>
 
         <label for="personal_email">Personal email</label>
-        <span class="error"> <?php echo $personalEmailErr;?></span><br>
-        <input type="text" name="personal_email" id="personal_email" value=<?php echo $personal_email ?>></br>
+        <span class="text-red-600 text-sm font-bold"> <?php echo $personalEmailErr;?></span><br>
+        <input class="rounded-md" type="text" name="personal_email" id="personal_email" value=<?php echo $personal_email ?>></br>
 
         <label for="student_email">Student email</label>
-        <span class="error"> <?php echo $studentEmailErr;?></span><br>
-        <input type="text" name="student_email" id="student_email" value=<?php echo $student_email ?>></br>
+        <span class="text-red-600 text-sm font-bold"> <?php echo $studentEmailErr;?></span><br>
+        <input class="rounded-md" type="text" name="student_email" id="student_email" value=<?php echo $student_email ?>></br>
 
         <label for="phone_number">Phone number</label>
-        <span class="error"> <?php echo $phoneNumberErr;?></span><br>
-        <input type="text" name="phone_number" id="phone_number" value=<?php echo $phone_number ?>></br>
+        <span class="text-red-600 text-sm font-bold"> <?php echo $phoneNumberErr;?></span><br>
+        <input class="rounded-md" type="text" name="phone_number" id="phone_number" value=<?php echo $phone_number ?>></br>
 
         <label for="address">Address</label>
-        <span class="error"> <?php echo $addressErr;?></span><br>
-        <input type="text" name="address" id="address" value=<?php echo $address ?>></br>
+        <span class="text-red-600 text-sm font-bold"> <?php echo $addressErr;?></span><br>
+        <input class="rounded-md" type="text" name="address" id="address" value=<?php echo $address ?>></br>
 
         <label for="course_id">Course ID</label>
         <select name="course_id" id="course_id"> 
@@ -190,5 +184,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         ?>
       </select>
 
-        <input class="submit" type="submit" name="submit" value="Add student" />
+        <input class="submit px-4 py-2 text-stone-100 text-lg bg-gradient-to-br from-sky-600 to-sky-800 rounded-xl mt-3 cursor-pointer shadow-gray-900 shadow-md hover:text-stone-200 hover:font-semibold hover:shadow-sm hover:shadow-gray-700" type="submit" name="submit" value="Add student" />
+    </form>
+    </div>
+        </div>
 <?php @ require_once ("footer.php"); ?>
