@@ -17,8 +17,14 @@
         <li>
             <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="addStudent.php">Add new student</a>
         </li>
+        <?php
+            if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+            header("location: home.php");
+            exit;
+        ?>
         <li>
-            <a href="logout.php">Logout</a>
+            <a class="py-1 px-4 rounded-lg my-2 bg-gradient-to-tl from-red-500 to-red-700 text-stone-100" href="logout.php">Logout</a>
         </li>
+    <?php } ?>
     </ul>
 </nav>
