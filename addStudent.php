@@ -1,3 +1,4 @@
+<?php include "header.php"; ?>
 <?php
 include_once 'database.php';
 
@@ -190,6 +191,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
       </select>
 
         <input class="submit" type="submit" name="submit" value="Add student" />
-    </form>
-</body>
-</html>
+<?php @ require_once ("footer.php"); ?>
