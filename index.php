@@ -1,109 +1,22 @@
-<?php
-// Initialize the session
-session_start();
- 
-// Check if the user is already logged in, if yes then redirect him to welcome page
-if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    header("location: home.php");
-    exit;
-}
- 
-// Include config file
-require_once "database.php";
- 
-// Define variables and initialize with empty values
-$username = $password = "";
-$username_err = $password_err = $login_err = "";
- 
-// Processing form data when form is submitted
-if($_SERVER["REQUEST_METHOD"] == "POST"){
- 
-    // Check if username is empty
-    if(empty(trim($_POST["username"]))){
-        $username_err = "Please enter username.";
-    } else{
-        $username = trim($_POST["username"]);
-    }
-    
-    // Check if password is empty
-    if(empty(trim($_POST["password"]))){
-        $password_err = "Please enter your password.";
-    } else{
-        $password = trim($_POST["password"]);
-    }
-    
-    // Validate credentials
-    if(empty($username_err) && empty($password_err)){
-        // Prepare a select statement
-        $sql = "SELECT id, username, password FROM users WHERE username = ?";
-        
-        if($stmt = mysqli_prepare($conn, $sql)){
-            // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "s", $param_username);
-            
-            // Set parameters
-            $param_username = $username;
-            
-            // Attempt to execute the prepared statement
-            if(mysqli_stmt_execute($stmt)){
-                // Store result
-                mysqli_stmt_store_result($stmt);
-                
-                // Check if username exists, if yes then verify password
-                if(mysqli_stmt_num_rows($stmt) == 1){                    
-                    // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
-                    if(mysqli_stmt_fetch($stmt)){
-                        if(password_verify($password, $hashed_password)){
-                            // Password is correct, so start a new session
-                            session_start();
-                            
-                            // Store data in session variables
-                            $_SESSION["loggedin"] = true;
-                            $_SESSION["id"] = $id;
-                            $_SESSION["username"] = $username;                            
-                            
-                            // Redirect user to welcome page
-                            header("location: students.php");
-                        } else{
-                            // Password is not valid, display a generic error message
-                            $login_err = "Invalid username or password.";
-                        }
-                    }
-                } else{
-                    // Username doesn't exist, display a generic error message
-                    $login_err = "Invalid username or password.";
-                }
-            } else{
-                echo "Oops! Something went wrong. Please try again later.";
-            }
-            // Close statement
-            mysqli_stmt_close($stmt);
-        }
-    }
-    // Close connection
-    mysqli_close($conn);
-}
-?>
-
+<?php session_start(); ?> 
 <div class="flex flex-col h-screen">
-  <?php include "header.php"; ?>
-  <div class="flex justify-center min-h-[80%] h-[80%] flex-grow items-center">
-    <div class="w-[20%] h-fit items-center bg-sky-500 rounded-2xl py-10 px-5 border-1 shadow-lg">
-      <form class="flex flex-col gap-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <h1 class="text-center text-4xl font-bold mb-8">Login</h1>
-        <label for="student_id">Email</label>
-        <span class="text-red-600 text-sm font-bold"> <?php echo $username_err;?></span>
-        <input class="rounded-md" type="text" name="username" id="username">
+    <div><?php include "header.php"; ?></div>
+  <div class="flex flex-row gap-5 w-[80%] self-center justify-center min-h-[80%] h-[80%] flex-grow items-center">
+    <div class="flex flex-col w-[50%] mx-10">
+        <span class="text-7xl mb-24 displayName -rotate-12">Csaba Jega-Szabo</span>
+        <span class="text-5xl mb-10">Student ID: HE20889</span>
+        <span class="text-3xl mb-10">BSc (Hon) Computing and BEng Software Engineering Foundation Year</span>
+        <span class="text-xl mb-5">MODULE CODE: <span class="font-bold text-2xl">SWE4203</span> | MODULE TITLE:	<span class="font-bold text-2xl">Databases | Assignment 2</span></span>
 
-        <label for="first_name">Password</label>
-        <span class="text-red-600 text-sm font-bold"> <?php echo $password_err;?></span>
-        <input class="rounded-md" type="text" name="password" id="password">
-
-        <input class="submit px-4 py-2 text-stone-100 text-lg bg-gradient-to-br from-sky-600 to-sky-800 rounded-xl mt-3 cursor-pointer shadow-gray-900 shadow-md hover:text-stone-200 hover:font-semibold hover:shadow-sm hover:shadow-gray-700" type="submit" name="submit" value="Login" />
-
-      </form>
+        <div class="text-3xl leading-10">
+            This web page was created to demonstrate the database defined in the assignment in action.
+            The database running in the background is the basis of the assignment, the login and the entire data movement, storage and retrieval are based on it.
+        </div>
     </div>
+    <div class="w-[40%] h-[100%] items-center">
+        <img class="w-full h-full self-center rounded-full" src="digital.jpg" />
+    </div>
+
   </div>
   <?php @ require_once ("footer.php"); ?>
 </div>

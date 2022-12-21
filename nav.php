@@ -1,5 +1,3 @@
-
-
 <nav>
     <ul class="flex flex-row w-screen h-12 bg-sky-500 justify-around items-center my-5 text-2xl">
         <li>
@@ -8,23 +6,59 @@
         <li>
             <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="courses.php">Courses</a>
         </li>
-        <li>
-            <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="students.php">Students</a>
-        </li>
-        <li>
-            <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="#">Staff</a>
-        </li>
-        <li>
-            <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="addStudent.php">Add new student</a>
-        </li>
         <?php
             if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-            header("location: home.php");
-            exit;
-        ?>
+                if($_SESSION["adminPos"] != 4){ ?>
+                <li>
+                <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="students.php">Students</a>
+                </li>
+        <?php }else{ ?>
+            <li>
+                    <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="student.php?varname=<?php echo $_SESSION["id"]; ?>">My data</a>
+                </li>
+        <?php }} ?>
+        <?php
+            if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+                if($_SESSION["adminPos"] != 4){ ?>
+                <li>
+                    <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="staff.php">Staff</a>
+                </li>
+        <?php }} ?>
+        <?php
+            if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+                if($_SESSION["adminPos"] != 4){ ?>
+                <li>
+                    <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="sqlCode.php">SQL code</a>
+                </li>
+        <?php }} ?>
+
+        <?php
+            if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+                if($_SESSION["adminPos"] == 3){ ?>
+                <li>
+                    <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="addStudent.php">Add new student</a>
+                </li>
+            <?php }} ?>
+        <?php
+            if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+                ?>
         <li>
             <a class="py-1 px-4 rounded-lg my-2 bg-gradient-to-tl from-red-500 to-red-700 text-stone-100" href="logout.php">Logout</a>
         </li>
-    <?php } ?>
+    <?php }else{
+            ?>
+            <li>
+                <a class="py-0.5 px-2 text-xl rounded-lg my-2 bg-gradient-to-tl from-green-500 to-green-700 text-stone-100" href="student_login.php">Student Login</a>
+                <a class="py-0.5 px-2 text-xl rounded-lg my-2 bg-gradient-to-tl from-green-500 to-green-700 text-stone-100" href="staff_login.php">Staff Login</a>
+            </li>
+        <?php } ?>
     </ul>
 </nav>
+<div class="flex flex-row w-screen h-12 mb-5 text-xl justify-center items-center bg-green-500">
+    <?php
+        if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+            echo "Welcomme " . $_SESSION["firstname"] . " " . $_SESSION["lastname"];
+    }else{
+        echo "You not logged in. If you want to check data, please LOGIN!";
+    }?>
+</div>
