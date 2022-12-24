@@ -5,7 +5,7 @@
         <?php
         if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
   ?>
-  <div class="p-5 w-[80%] bg-sky-100 self-center word-break: break-all overflow-scroll">
+  <div class="sql-shadow p-5 w-[80%] bg-sky-100 self-center word-break: break-all overflow-scroll ">
     <pre class="w-[100%] flex word-break: break-all">
     create database assignment;
 

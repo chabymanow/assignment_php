@@ -61,7 +61,16 @@ while($row = mysqli_fetch_array($student)) {
       </select>
     </td> -->
     <td class="px-2 mr-2 border-b-2 border-sky-200"><?php echo $row["studentStartDate"]; ?></td>
-    <td><a class="py-2 px-4 ml-5 rounded-lg bg-gradient-to-tr from-green-400 to-green-700" href="student.php?varname=<?php echo $row["studentID"]; ?>">Edit</a></td>
+    <td>
+      <a class="flex py-2 px-4 ml-5 rounded-lg bg-gradient-to-tr from-green-400 to-green-700 text-stone-100 cursor-pointer hover-text
+        hover:from-green-200 hover:to-green-400 hover:text-stone-700" href="student.php?varname=<?php echo $row["studentID"]; ?>">
+        <button type="button">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg>
+        </button>     
+        <span class="tooltip-text" id="bottom">See the data of this student...</span>
+      </a>
+     
+    </td>
 </tr>
 <?php
 $i++;

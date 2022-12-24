@@ -1,5 +1,13 @@
+<div class="flex flex-row w-screen h-12 text-xl justify-center items-center bg-green-500">
+    <?php
+        if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+            echo "Welcomme " . $_SESSION["firstname"] . " " . $_SESSION["lastname"];
+    }else{
+        echo "You not logged in. If you want to check data, please LOGIN!";
+    }?>
+</div>
 <nav>
-    <ul class="flex flex-row w-screen h-12 bg-sky-500 justify-around items-center my-5 text-2xl">
+    <ul class="flex flex-row w-screen h-12 bg-sky-500 justify-around items-center mb-10 text-2xl">
         <li>
             <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="index.php">Home</a>
         </li>
@@ -48,17 +56,9 @@
     <?php }else{
             ?>
             <li>
-                <a class="py-0.5 px-2 text-xl rounded-lg my-2 bg-gradient-to-tl from-green-500 to-green-700 text-stone-100" href="student_login.php">Student Login</a>
-                <a class="py-0.5 px-2 text-xl rounded-lg my-2 bg-gradient-to-tl from-green-500 to-green-700 text-stone-100" href="staff_login.php">Staff Login</a>
+                <a class="py-2 px-4 text-2xl border-2 border-teal-400 bg-gradient-to-tl from-teal-500 to-teal-700 text-stone-100" href="student_login.php">Student Login</a>
+                <a class="py-2 px-4 text-2xl border-2 border-teal-400 bg-gradient-to-tl from-teal-500 to-teal-700 text-stone-100" href="staff_login.php">Staff Login</a>
             </li>
         <?php } ?>
     </ul>
 </nav>
-<div class="flex flex-row w-screen h-12 mb-5 text-xl justify-center items-center bg-green-500">
-    <?php
-        if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-            echo "Welcomme " . $_SESSION["firstname"] . " " . $_SESSION["lastname"];
-    }else{
-        echo "You not logged in. If you want to check data, please LOGIN!";
-    }?>
-</div>

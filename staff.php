@@ -5,14 +5,11 @@
         <?php
         if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
         include_once 'database.php';
+        include "generator.php";
 
-        $staffMembers = mysqli_query($conn,
-            "SELECT * FROM staff
-            INNER JOIN staff_phone on staff.staffID = staff_phone.staffID
-            -- GROUP BY staff.staffID
-        ");
-
+        $staffMembers = generateStaffmembers();
         ?>
+
         <h1 class="text-center text-3xl font-bold underline">Staff of the school</h1>
         <div class="flex justify-center">
 <table class="m-5 text-stone-800 text-lg">
@@ -81,7 +78,7 @@ while($row = mysqli_fetch_array($staffMembers)) {
         }
     ?>
     <td class="px-2 py-2 mr-2 border-b-2 border-sky-200 w-32">
-        <img src="<?php echo $row["staff_photo"]?>" />
+        <img class="rounded-xl" src="<?php echo generatePhoto() ?>" />
     </td>
 </tr>
 <?php

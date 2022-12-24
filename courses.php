@@ -6,8 +6,6 @@
     include_once 'database.php';
 
     $courses = mysqli_query($conn, "SELECT * FROM courses"); 
-    // -- INNER JOIN exams ON courses.exam = exams.ID
-    // -- INNER JOIN lecturers ON courses.Lecturer = lecturers.ID");
 
     $examDates = mysqli_query($conn, "SELECT * FROM exams");
     while($row = mysqli_fetch_array($examDates))

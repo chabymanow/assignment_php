@@ -3,15 +3,13 @@
 <div><?php include "header.php"; ?></div>
 <div class="flex flex-grow justify-center">
 <?php
-if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-include_once 'database.php';
+    if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+        include_once 'database.php';
+        include "generator.php";
 
-$var_value = $_GET['varname'];
-$student = mysqli_query($conn,
-    "SELECT * FROM students
-    INNER JOIN courses ON students.courseID = courses.courseID
-    WHERE studentID='$var_value'");
-
+        // echo generateView($_GET['varname']);
+        $var_value = $_GET['varname'];
+        $student = generateView($_GET['varname']);
 ?>
 <div class="w-[80%] flex flex-row gap-5 self-center">
     <?php
@@ -19,10 +17,7 @@ $student = mysqli_query($conn,
         while($row = mysqli_fetch_array($student)) { 
             $course = $row["courseID"];
             $exams = mysqli_query($conn, "SELECT * FROM exams WHERE courseID = '$course'");
-            $timeTable = mysqli_query($conn,
-                "SELECT * FROM timetable_handler
-                INNER JOIN timetable on timetable_handler.timetableID = timetable.timetableID
-                WHERE timetable_handler.studentID = '$var_value'");
+            $timeTable = generateTimetable($_GET['varname']);
             $examRes = mysqli_query($conn, "SELECT * FROM exam_results WHERE studentID = '$var_value'");
             $examResLong = mysqli_num_rows($examRes);
             
@@ -30,7 +25,9 @@ $student = mysqli_query($conn,
     <div class="flex flex-col w-[50%] gap-5">  
         <div class="flex flex-row gap-5 items-center">
             <span class="w-32">Photo: </span>
-            <img src=<?php echo $row["studentPhoto"]?> />
+            <!-- <img src=<?php echo $row["studentPhoto"]?> /> -->
+            <img class="rounded-xl" src=<?php echo generatePhoto()?> />
+            
         </div>
         <div class="flex flex-row gap-5 items-center">
             <span class="w-32">Student ID: </span>
@@ -63,10 +60,8 @@ $student = mysqli_query($conn,
     
     <?php } ?>
     <span class="text-xl">Timetable</span>
-    <?php while($row = mysqli_fetch_array($timeTable)) {?>
-       
-                    <div class="flex flex-col">
-                    
+    <?php while($row = mysqli_fetch_array($timeTable)) {?>       
+                    <div class="flex flex-col">                 
                         <div class="text-lg py-2 px-5 w-80 rounded-md bg-sky-200">
                             <?php echo $row["timetable_day"]; ?>:
                             <?php echo $row["timetable_begin_time"]; ?> -
