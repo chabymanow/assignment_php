@@ -7,10 +7,37 @@
   ?>
   <div class="sql-shadow p-5 w-[80%] bg-sky-100 self-center word-break: break-all overflow-scroll ">
     <pre class="w-[100%] flex word-break: break-all">
-    create database assignment;
+#------------------------------------------------------------------------------------------------------------------------
+# Table list in this schema
+#------------------------------------------------------------------------------------------------------------------------
+#	academics: data for the academic staff
+#	administrator: data for administrator staff
+#	attendance: attendance data for students
+#	college: data of  the school
+#	courses: data for the courses in the college
+#	delete_staff_data: the old data when staff data deleted
+#	delete_student_data: the old data when student data deleted
+#	exam_result: the data of the student`s result of exams
+#	exams: the data for the exams
+#	roles: detailed data on user permissions
+#	staff: store data of the college staff
+#	staff_emails: emails for the staff
+#	staff_outdate_data: store the old data when staff data updated
+#	staff_phone: phone numbers of the staff
+#	student_outdate_data: store the old data when student data updated
+#	students: data of the students
+#	timetable: timetable for the courses
+#	timetable_handler: connect the student table and timetable table
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create and use database
+#------------------------------------------------------------------------------------------------------------------------
+create database assignment;
 use assignment;
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create college table and insert some data
+#------------------------------------------------------------------------------------------------------------------------
 create table college(
 collegeID int primary key not null auto_increment,
 collegeName varchar(20),
@@ -19,8 +46,12 @@ collegeEmail varchar(45),
 collegePhoneNumber varchar(30)
 );
 
-insert into college (collegeID, collegeName, collegeAddress, collegeEmail, collegePhoneNumber) values (1, 'Xavier School', '13450 South Circle', 'chorwell0@businessweek.com', '+355 997 756 3563');
+insert into college (collegeID, collegeName, collegeAddress, collegeEmail, collegePhoneNumber) values
+(1, 'Xavier School', '13450 South Circle', 'chorwell0@businessweek.com', '+355 997 756 3563');
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create student table and insert 100 student data
+#------------------------------------------------------------------------------------------------------------------------
  create table students (
  studentID int primary key not null auto_increment,
  courseID int not null,
@@ -32,10 +63,12 @@ insert into college (collegeID, collegeName, collegeAddress, collegeEmail, colle
  studentAddress text,
  studentStartDate DATE,
  studentDOB DATE,
+ studentCode varChar(15) NOT NULL UNIQUE,
+ password varChar(100),
  CONSTRAINT fk_courseID foreign key (courseID)
     REFERENCES courses (courseID)
  );
- 
+
 insert into students (courseID, studentFirstName, studentLastName, studentPhoto, studentEmail, studentPhoneNumber, studentAddress, studentStartDate, studentDOB) values
 (37, 'Nels', 'Mournian', 'http://dummyimage.com/164x100.png/ff4444/ffffff', 'nmournian0@newsvine.com', '618-448-8826', '491 Forest Dale Parkway', '2022-04-24', '1978-09-27'),
 (33, 'Jemima', 'Matthewman', 'http://dummyimage.com/208x100.png/dddddd/000000', 'jmatthewman1@spiegel.de', '485-783-1241', '16 Reindahl Way', '2022-07-20', '2001-06-29'),
@@ -138,7 +171,70 @@ insert into students (courseID, studentFirstName, studentLastName, studentPhoto,
 (32, 'Patrice', 'Willimot', 'http://dummyimage.com/211x100.png/5fa2dd/ffffff', 'pwillimot2q@bloomberg.com', '612-656-2156', '55 Michigan Alley', '2022-07-26', '1988-11-16'),
 (32, 'Grant', 'Hasel', 'http://dummyimage.com/196x100.png/5fa2dd/ffffff', 'ghasel2r@epa.gov', '934-921-0885', '55698 Stang Pass', '2022-08-21', '1963-06-19');
 
-select * from students;
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for student data before update and create trigger to save student data before update
+#------------------------------------------------------------------------------------------------------------------------
+create table student_outdate_data (
+ courseID int not null,
+ studentFirstName varchar(20),
+ studentLastName varchar(20),
+ studentPhoto text,
+ studentEmail varchar(50),
+ studentPhoneNumber varchar(15),
+ studentAddress text,
+ studentStartDate DATE,
+ studentDOB DATE,
+ studentCode varChar(15),
+ changedate DATE
+ );
+ 
+ CREATE TRIGGER `before_student_update`
+ BEFORE UPDATE ON `students`
+ FOR EACH ROW 
+ INSERT INTO student_outdate_data
+ (courseID, studentFirstName, studentLastName, studentPhoto, studentEmail,
+ studentPhoneNumber, studentAddress, studentStartDate, studentDOB, studentCode, changedate)
+  VALUES
+	(old.courseID, old.studentFirstName, old.studentLastName,
+	old.studentPhoto, old.studentEmail,
+	old.studentPhoneNumber, old.studentAddress,
+	old.studentStartDate, old.studentDOB,
+	old.studentCode, now());
+
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for student data before delete and create trigger to save student data before delete
+#------------------------------------------------------------------------------------------------------------------------
+
+ create table deleted_student_data (
+ courseID int not null,
+ studentFirstName varchar(20),
+ studentLastName varchar(20),
+ studentPhoto text,
+ studentEmail varchar(50),
+ studentPhoneNumber varchar(15),
+ studentAddress text,
+ studentStartDate DATE,
+ studentDOB DATE,
+ studentCode varChar(15),
+ changedate DATE
+ );
+ 
+ CREATE TRIGGER `before_student_delete`
+ BEFORE DELETE ON `students`
+ FOR EACH ROW 
+ INSERT INTO deleted_student_data
+ (courseID, studentFirstName, studentLastName, studentPhoto, studentEmail,
+ studentPhoneNumber, studentAddress, studentStartDate, studentDOB, studentCode, changedate)
+  VALUES
+	(old.courseID, old.studentFirstName, old.studentLastName,
+	old.studentPhoto, old.studentEmail,
+	old.studentPhoneNumber, old.studentAddress,
+	old.studentStartDate, old.studentDOB,
+	old.studentCode, now());
+ 
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for student`s attendance
+#------------------------------------------------------------------------------------------------------------------------
 
 create table attendance(
 attendanceID int primary key not null auto_increment,
@@ -149,12 +245,34 @@ foreign key (studentID)
 references students(studentID)
 );
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the courses data and insert data
+#------------------------------------------------------------------------------------------------------------------------
+
  create table courses (
  courseID int primary key not null auto_increment,
  courseName varchar(60),
- courseDesc text
+ courseDesc text,
+ courseCode varChar(15)
  );
  
+ INSERT INTO courses (courseName, courseCode, courseDesc) VALUES
+ ("AAT Accounting Academy Level 3", "Course01", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("AAT Accounting Level 2", "Course02", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("Principles of Business Administration Level 2", "Course03", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("Principles of Team Leading Level 2", "Course04", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("BTEC Level 1 Certificate for ICT Users", "Course05", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("BTEC Level 2 Diploma for IT Users", "Course06", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("T Level in Digital Production, Design and Development", "Course07", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("Level 1 Diploma in Creative Media Production and Technology", "Course08", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("Level 1: BTEC Introductory Diploma in Vocational Studies", "Course09", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("Level 2 Diploma in Media (UAL)", "Course10", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus."),
+ ("Level 3 Diploma in Media Production and Technology (UAL)", "Course11", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque gravida interdum leo sed tempus. Praesent in gravida dui, ac semper augue. Pellentesque commodo mollis dapibus. Integer venenatis magna velit, in iaculis erat tincidunt sed. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus quis sem fringilla sapien pellentesque imperdiet ut ac lectus.");
+
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the timetable data and insert the basic data
+#------------------------------------------------------------------------------------------------------------------------
+
 create table timetable(
 timtableID int primary key not null auto_increment,
 timetable_begin_time time,
@@ -175,7 +293,9 @@ insert into timetable (timetable_day, timetable_begin_time, timetable_end_time) 
 ("Saturday", "10:00:00", "17:00:00"),
 ("Sunday", "10:00:00", "17:00:00");
 
-select * from courses;
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the timetable handler and insert data
+#------------------------------------------------------------------------------------------------------------------------
 
 create table timetable_handler(
 handlerID int primary key not null auto_increment,
@@ -218,6 +338,10 @@ insert into timetable_handler (studentID, timetableID) values
 (93, 2), (93, 4), (93, 6), (93, 8), (94, 2), (94, 4), (94, 6), (94, 8), (95, 2), (95, 4), (95, 6), (95, 8),
 (96, 3), (96, 5), (97, 10), (97, 11), (98, 10), (98, 11), (99, 10), (99, 11), (100, 10), (100, 11);
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the exams and insert data
+#------------------------------------------------------------------------------------------------------------------------
+
 CREATE table exams(
 examID int primary key not null auto_increment,
 courseID int,
@@ -241,6 +365,10 @@ insert into exams (courseID, exam_name, exam_description, exam_date) values
 (41, 'assignment 01', "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer pharetra mauris vitae lorem consectetur, eget rhoncus lacus accumsan. Nulla et sollicitudin odio, quis ornare urna. Sed ac laoreet nisi. Praesent id dictum enim, non molestie odio. Proin euismod tincidunt nulla nec eleifend. Nullam id sollicitudin magna. Aliquam ornare, libero accumsan tincidunt viverra, turpis justo scelerisque turpis, ac consectetur nibh dui vel purus. Quisque sodales nulla metus, eu sagittis augue aliquam quis. In finibus ante eu tellus ullamcorper aliquet. Etiam eget maximus mauris. Cras vel dolor mi. Proin a egestas enim, et vulputate ligula. Cras consequat elementum nibh ac vehicula. ", "2023-02-20"),
 (42, 'assignment 01', "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer pharetra mauris vitae lorem consectetur, eget rhoncus lacus accumsan. Nulla et sollicitudin odio, quis ornare urna. Sed ac laoreet nisi. Praesent id dictum enim, non molestie odio. Proin euismod tincidunt nulla nec eleifend. Nullam id sollicitudin magna. Aliquam ornare, libero accumsan tincidunt viverra, turpis justo scelerisque turpis, ac consectetur nibh dui vel purus. Quisque sodales nulla metus, eu sagittis augue aliquam quis. In finibus ante eu tellus ullamcorper aliquet. Etiam eget maximus mauris. Cras vel dolor mi. Proin a egestas enim, et vulputate ligula. Cras consequat elementum nibh ac vehicula. ", "2023-01-28");
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the exam`s results
+#------------------------------------------------------------------------------------------------------------------------
+
 create table exam_results(
 resultID int primary key not null auto_increment,
 examID int,
@@ -253,35 +381,96 @@ foreign key (studentID)
 references students(studentID)
 );
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the satff and insert data
+#------------------------------------------------------------------------------------------------------------------------
+
 create table staff(
 staffID int primary key not null auto_increment,
 staff_firstName varchar(30),
 staff_lastName varchar(30),
 staff_address varchar(100),
 staff_photo text,
-is_admin int
+is_admin int,
+password varChar(255)
 );
 
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Joellyn', 'Bunny', '0894 Kipling Court', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Ilene', 'Stolberg', '89 Dennis Plaza', 'http://dummyimage.com/250x250.png/dddddd/000000', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Arlen', 'Diggens', '7497 Crescent Oaks Park', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Twyla', 'Patnelli', '4020 Mendota Drive', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Koral', 'Corkish', '868 Russell Plaza', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Renaldo', 'Brittoner', '46 Elka Circle', 'http://dummyimage.com/250x250.png/cc0000/ffffff', 0);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Helaine', 'Heinl', '3 Lake View Way', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Sasha', 'Alasdair', '92 Old Shore Hill', 'http://dummyimage.com/250x250.png/dddddd/000000', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Errol', 'Desquesnes', '14 Dwight Park', 'http://dummyimage.com/250x250.png/cc0000/ffffff', 0);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Tabby', 'Schultheiss', '7 Merchant Point', 'http://dummyimage.com/250x250.png/dddddd/000000', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Reeta', 'Doubrava', '77764 American Circle', 'http://dummyimage.com/250x250.png/dddddd/000000', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Antonia', 'Mudle', '1 Namekagon Junction', 'http://dummyimage.com/250x250.png/dddddd/000000', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Ulric', 'Turpey', '7310 Schiller Junction', 'http://dummyimage.com/250x250.png/dddddd/000000', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Ella', 'Parkey', '91 Onsgard Circle', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Godwin', 'Covely', '13 Dakota Hill', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Jacky', 'Annear', '258 Comanche Way', 'http://dummyimage.com/250x250.png/cc0000/ffffff', 0);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Buiron', 'Trowl', '0 Hazelcrest Crossing', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Bill', 'Kalf', '16 Bobwhite Plaza', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Salaidh', 'Gouge', '14 Amoth Court', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
-insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values ('Rafael', 'Mewitt', '5731 Pawling Park', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
+insert into staff (staff_firstName, staff_lastName, staff_address, staff_photo, is_admin) values 
+('Joellyn', 'Bunny', '0894 Kipling Court', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0),
+('Ilene', 'Stolberg', '89 Dennis Plaza', 'http://dummyimage.com/250x250.png/dddddd/000000', 1),
+('Arlen', 'Diggens', '7497 Crescent Oaks Park', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1),
+('Twyla', 'Patnelli', '4020 Mendota Drive', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1),
+('Koral', 'Corkish', '868 Russell Plaza', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0),
+('Renaldo', 'Brittoner', '46 Elka Circle', 'http://dummyimage.com/250x250.png/cc0000/ffffff', 0),
+('Helaine', 'Heinl', '3 Lake View Way', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0),
+('Sasha', 'Alasdair', '92 Old Shore Hill', 'http://dummyimage.com/250x250.png/dddddd/000000', 1),
+('Errol', 'Desquesnes', '14 Dwight Park', 'http://dummyimage.com/250x250.png/cc0000/ffffff', 0),
+('Tabby', 'Schultheiss', '7 Merchant Point', 'http://dummyimage.com/250x250.png/dddddd/000000', 1),
+('Reeta', 'Doubrava', '77764 American Circle', 'http://dummyimage.com/250x250.png/dddddd/000000', 1),
+('Antonia', 'Mudle', '1 Namekagon Junction', 'http://dummyimage.com/250x250.png/dddddd/000000', 1),
+('Ulric', 'Turpey', '7310 Schiller Junction', 'http://dummyimage.com/250x250.png/dddddd/000000', 1),
+('Ella', 'Parkey', '91 Onsgard Circle', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1),
+('Godwin', 'Covely', '13 Dakota Hill', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1),
+('Jacky', 'Annear', '258 Comanche Way', 'http://dummyimage.com/250x250.png/cc0000/ffffff', 0),
+('Buiron', 'Trowl', '0 Hazelcrest Crossing', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1),
+('Bill', 'Kalf', '16 Bobwhite Plaza', 'http://dummyimage.com/250x250.png/ff4444/ffffff', 0),
+('Salaidh', 'Gouge', '14 Amoth Court', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1),
+('Rafael', 'Mewitt', '5731 Pawling Park', 'http://dummyimage.com/250x250.png/5fa2dd/ffffff', 1);
+
+SELECT staff_firstName FROM staff WHERE staffID = 1;
+
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for staff data before update and create trigger to save staff data before update
+#------------------------------------------------------------------------------------------------------------------------
+create table staff_outdate_data (
+ staffID INT primary key not null auto_increment,
+ staff_firstName varchar(20),
+ staff_lastName varchar(20),
+ staff_address text,
+ staff_photo varchar(50),
+ is_admin varchar(15),
+ staff_email varChar(50),
+ staff_phone varChar(15),
+ changedate DATE);
+ 
+ CREATE TRIGGER `before_staff_update`
+ BEFORE UPDATE ON `staff`
+ FOR EACH ROW INSERT INTO staff_outdate_data
+ (staffID, staff_firstName, staff_lastName, staff_address, staff_photo, is_admin, staff_email, staff_phone, changedate)
+  VALUES
+	(old.staffID, old.staff_firstName, old.staff_lastName,
+	old.staff_address, old.staff_photo,
+	old.is_admin, (SELECT staff_email FROM staff_emails WHERE staff_emails.staffID = old.staffID LIMIT 1),
+    (SELECT staff_phone FROM staff_phone WHERE staff_phone.staffID = old.staffID LIMIT 1), now());
+
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for staff data before delete and create trigger to save staff data before delete
+#------------------------------------------------------------------------------------------------------------------------
+
+ create table deleted_staff_data (
+ staffID INT primary key not null auto_increment,
+ staff_firstName varchar(20),
+ staff_lastName varchar(20),
+ staff_address text,
+ staff_photo varchar(50),
+ is_admin varchar(15),
+ staff_email varChar(50),
+ staff_phone varChar(15),
+ changedate DATE);
+
+ CREATE TRIGGER `before_staff_delete`
+ BEFORE DELETE ON `staff`
+ FOR EACH ROW INSERT INTO staff_outdate_data
+ (staffID, staff_firstName, staff_lastName, staff_address, staff_photo, is_admin, staff_email, staff_phone, changedate)
+  VALUES
+	(old.staffID, old.staff_firstName, old.staff_lastName,
+	old.staff_address, old.staff_photo,
+	old.is_admin, (SELECT staff_email FROM staff_emails WHERE staff_emails.staffID = old.staffID LIMIT 1),
+    (SELECT staff_phone FROM staff_phone WHERE staff_phone.staffID = old.staffID LIMIT 1), now());
+    
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the staff`s email and insert data
+#------------------------------------------------------------------------------------------------------------------------
 
 create table staff_emails(
 emailID int primary key not null auto_increment,
@@ -292,26 +481,20 @@ references staff(staffID)
 );
 
 insert into staff_emails (staffID, staff_email) values 
-(1, 'rwhittenbury0@telegraph.co.uk'), (1, 'gsheriff3@time.com'),
-(2, 'cruck1@typepad.com'), (2, 'jraittie2@house.gov'),
-(3, 'prockcliffe4@hubpages.com'),(3, 'bepinoy5@amazonaws.com'),
-(4, 'glindfors6@aol.com'),(4, 'ikeems8@answers.com'),
-(5, 'imccoughan7@meetup.com'), (5, 'mwrey9@senate.gov'),
-(6, 'owhitlama@merriam-webster.com'), (6, 'tdorsayb@columbia.edu'),
-(7, 'fdoddridgec@census.gov'), (7, 'rbelhomed@lycos.com'),
-(8, 'ebradnockee@theguardian.com'), (8, 'csarsonsf@admin.ch'),
-(9, 'smetterickeg@photobucket.com'), (9, 'ssigarsh@squarespace.com'),
-(10, 'mauchterlonyi@princeton.edu'), (10, 'isarneyj@studiopress.com'),
-(11, 'inaultyk@com.com'), (11, 'bvedenichevl@addthis.com'),
-(12, 'jdykesm@oaic.gov.au'), (12, 'ldrohanen@google.fr'),
-(13, 'estrideo@prlog.org'), (13, 'agaulerp@archive.org'),
-(14, 'bkhomishinq@facebook.com'), (14, 'eandriuzzir@infoseek.co.jp'),
-(15, 'rshooters@gmpg.org'), (15, 'mabazit@gov.uk'),
-(16, 'croylu@opera.com'), (16, 'agrosierv@ihg.com'),
-(17, 'nenrightw@wired.com'), (17, 'bgrennanx@nasa.gov'),
-(18, 'hjuanesy@miibeian.gov.cn'), (18, 'sbeverleyz@surveymonkey.com'),
-(19, 'warens10@netvibes.com'), (19, 'tpowter11@hp.com'),
-(20, 'aalsford12@4shared.com'), (20, 'adebell13@live.com');
+(1, 'rwhittenbury0@telegraph.co.uk'), (1, 'gsheriff3@time.com'), (2, 'cruck1@typepad.com'), (2, 'jraittie2@house.gov'),
+(3, 'prockcliffe4@hubpages.com'),(3, 'bepinoy5@amazonaws.com'), (4, 'glindfors6@aol.com'),(4, 'ikeems8@answers.com'),
+(5, 'imccoughan7@meetup.com'), (5, 'mwrey9@senate.gov'), (6, 'owhitlama@merriam-webster.com'), (6, 'tdorsayb@columbia.edu'),
+(7, 'fdoddridgec@census.gov'), (7, 'rbelhomed@lycos.com'), (8, 'ebradnockee@theguardian.com'), (8, 'csarsonsf@admin.ch'),
+(9, 'smetterickeg@photobucket.com'), (9, 'ssigarsh@squarespace.com'), (10, 'mauchterlonyi@princeton.edu'), (10, 'isarneyj@studiopress.com'),
+(11, 'inaultyk@com.com'), (11, 'bvedenichevl@addthis.com'), (12, 'jdykesm@oaic.gov.au'), (12, 'ldrohanen@google.fr'),
+(13, 'estrideo@prlog.org'), (13, 'agaulerp@archive.org'), (14, 'bkhomishinq@facebook.com'), (14, 'eandriuzzir@infoseek.co.jp'),
+(15, 'rshooters@gmpg.org'), (15, 'mabazit@gov.uk'), (16, 'croylu@opera.com'), (16, 'agrosierv@ihg.com'),
+(17, 'nenrightw@wired.com'), (17, 'bgrennanx@nasa.gov'), (18, 'hjuanesy@miibeian.gov.cn'), (18, 'sbeverleyz@surveymonkey.com'),
+(19, 'warens10@netvibes.com'), (19, 'tpowter11@hp.com'), (20, 'aalsford12@4shared.com'), (20, 'adebell13@live.com');
+
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the staff`s phone number and insert data
+#------------------------------------------------------------------------------------------------------------------------
 
 create table staff_phone(
 phoneID int primary key not null auto_increment,
@@ -321,27 +504,16 @@ foreign key (staffID)
 references staff(staffID)
 );
 
-insert into staff_phone (staffID, staff_phone) values (1, '(233) 1827908');
-insert into staff_phone (staffID, staff_phone) values (2, '(169) 6413058');
-insert into staff_phone (staffID, staff_phone) values (3, '(418) 3656287');
-insert into staff_phone (staffID, staff_phone) values (4, '(310) 2385640');
-insert into staff_phone (staffID, staff_phone) values (5, '(747) 5824244');
-insert into staff_phone (staffID, staff_phone) values (6, '(606) 2501375');
-insert into staff_phone (staffID, staff_phone) values (7, '(536) 4207269');
-insert into staff_phone (staffID, staff_phone) values (8, '(783) 9332630');
-insert into staff_phone (staffID, staff_phone) values (9, '(999) 6499249');
-insert into staff_phone (staffID, staff_phone) values (10, '(455) 3967551');
-insert into staff_phone (staffID, staff_phone) values (11, '(316) 8761607');
-insert into staff_phone (staffID, staff_phone) values (12, '(700) 2839382');
-insert into staff_phone (staffID, staff_phone) values (13, '(339) 4557046');
-insert into staff_phone (staffID, staff_phone) values (14, '(990) 7572609');
-insert into staff_phone (staffID, staff_phone) values (15, '(120) 5796990');
-insert into staff_phone (staffID, staff_phone) values (16, '(896) 5331910');
-insert into staff_phone (staffID, staff_phone) values (17, '(143) 2023566');
-insert into staff_phone (staffID, staff_phone) values (18, '(308) 9841318');
-insert into staff_phone (staffID, staff_phone) values (19, '(843) 6707399');
-insert into staff_phone (staffID, staff_phone) values (20, '(987) 1837437');
+insert into staff_phone (staffID, staff_phone) values
+(1, '(233) 1827908'), (2, '(169) 6413058'), (3, '(418) 3656287'), (4, '(310) 2385640'),
+(5, '(747) 5824244'), (6, '(606) 2501375'), (7, '(536) 4207269'), (8, '(783) 9332630'),
+(9, '(999) 6499249'), (10, '(455) 3967551'), (11, '(316) 8761607'), (12, '(700) 2839382'),
+(13, '(339) 4557046'), (14, '(990) 7572609'), (15, '(120) 5796990'), (16, '(896) 5331910'),
+(17, '(143) 2023566'), (18, '(308) 9841318'), (19, '(843) 6707399'), (20, '(987) 1837437');
 
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the staff`s academic data and insert the data
+#------------------------------------------------------------------------------------------------------------------------
 create table academics(
 academicID int primary key not null auto_increment,
 staffID int,
@@ -352,18 +524,16 @@ references staff(staffID)
 );
 
 insert into academics (staffID, qualification, staff_title) values
-(1, "Doctoral degree", "IT teacher"),
-(2, "Doctoral degree", "Business teacher"),
-(3, "Master's degree", "Business teacher"),
-(4, "Doctoral degree", "IT teacher"),
-(5, "Higher National Diploma", "Accounting teacher"),
-(6, "Higher National Diploma", "Accounting teacher"),
-(7, "Doctoral degree", "Team Leading teacher"),
-(8, "Doctoral degree", "Team Leading teacher"),
-(9, "Master's degree", "Media teacher"),
-(10, "Doctoral degree", "Media teacher"),
-(11, "Master's degree", "Digital production teacher"),
-(12, "Doctoral degree", "Digital production teacher");
+(1, "Doctoral degree", "IT teacher"), (2, "Doctoral degree", "Business teacher"),
+(3, "Master's degree", "Business teacher"), (4, "Doctoral degree", "IT teacher"),
+(5, "Higher National Diploma", "Accounting teacher"), (6, "Higher National Diploma", "Accounting teacher"),
+(7, "Doctoral degree", "Team Leading teacher"), (8, "Doctoral degree", "Team Leading teacher"),
+(9, "Master's degree", "Media teacher"), (10, "Doctoral degree", "Media teacher"),
+(11, "Master's degree", "Digital production teacher"), (12, "Doctoral degree", "Digital production teacher");
+
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the staff`s administrator data and insert the data
+#------------------------------------------------------------------------------------------------------------------------
 
 create table administrator(
 adminID int primary key not null auto_increment,
@@ -376,14 +546,14 @@ references staff(staffID)
 );
 
 insert into administrator(staffID, department,  admin_position, admin_rule) values
-(13, "Accounting", "Accountant leader", 1),
-(14, "HR", "HR leader", 2),
-(15, "HR", "HR administraor", 1),
-(16, "Finance", "Finance officer", 2),
-(17, "Stundent support", "Stundent support leader", 3),
-(18, "Stundent support", "Stundent support officer", 2),
-(19, "Acaddemmic support", "Acaddemmic support leader", 3),
-(20, "Acaddemmic support", "Acaddemmic support officer", 2);
+(13, "Accounting", "Accountant leader", 1), (14, "HR", "HR leader", 2),
+(15, "HR", "HR administraor", 1), (16, "Finance", "Finance officer", 2),
+(17, "Stundent support", "Stundent support leader", 3), (18, "Stundent support", "Stundent support officer", 2),
+(19, "Acaddemmic support", "Acaddemmic support leader", 3), (20, "Acaddemmic support", "Acaddemmic support officer", 2);
+
+#------------------------------------------------------------------------------------------------------------------------
+# Create table for the administrator roles and insert the data
+#------------------------------------------------------------------------------------------------------------------------
 
 create table roles (
 roleID int primary key not null auto_increment,
@@ -392,9 +562,9 @@ role_desc varChar(100)
 );
 
 insert into roles (role_pos, role_desc) values
-(1, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "),
-(2, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "),
-(3, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ");
+(1, "Reader. People with this role can see the data,but cannot edit it."),
+(2, "Editor. People with this role can see and edit thex exists data,but cannot create new."),
+(3, "Root admin. People with this role can see and edit the data and can create new data in the system.");
 </pre>
 </div>
 <?php }else{ ?>
