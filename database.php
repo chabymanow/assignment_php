@@ -1,5 +1,5 @@
 <?php
-include "security_data.php";
+include "private.php";
     $url='127.0.0.1:3306';
     $conn=mysqli_connect($url,$username,$password,"assignment");
     if(!$conn){
