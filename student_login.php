@@ -102,7 +102,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         <label for="first_name">Password</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $password_err;?></span>
-        <input class="rounded-md" type="text" name="password" id="password">
+        <input class="rounded-md" type="password" name="password" id="password">
 
         <input class="submit px-4 py-2 text-stone-100 text-lg bg-gradient-to-br from-sky-600 to-sky-800 rounded-xl mt-3 cursor-pointer shadow-gray-900 shadow-md hover:text-stone-200 hover:font-semibold hover:shadow-sm hover:shadow-gray-700" type="submit" name="submit" value="Login" />
 
