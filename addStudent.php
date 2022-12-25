@@ -6,9 +6,11 @@
         if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
             include_once 'database.php';
             include "generator.php";
+
             $studentIdErr = $firstNameErr = $lastNameErr = $personalEmailErr = $studentEmailErr = $phoneNumberErr = $addressErr = $courseIdErr = $dobErr = "";
             $student_code = $first_name = $last_name = $personal_email = $student_email = $phone_number = $address = $course_id = $dob = "";
-            $photo = "None";
+            $photo = "http://dummyimage.com/179x100.png/ff4444/ffffff";
+            $message = "";
             $writeData = FALSE;
 
             // $student_ids = array();
@@ -21,6 +23,7 @@
             // foreach($student_ids as $ids){
             //     echo $ids["student_id"] . " | ";
             // }
+
             function isDigits(string $s, int $minDigits = 9, int $maxDigits = 14): bool {
                 return preg_match('/^[0-9]{'.$minDigits.','.$maxDigits.'}\z/', $s);
             }
@@ -45,7 +48,6 @@
                         $studentIdErr = "Student code is required!";
                     }else{
                         $ids = $_POST["student_code"];
-                        echo "--" . $ids . "--";
                         $sql = "SELECT * FROM students WHERE studentCode = '$ids'";
                         if($result = mysqli_query($conn, $sql)){
                             $rowcount = mysqli_fetch_array($result, MYSQLI_NUM);
@@ -55,9 +57,8 @@
                                 $studentIdErr = "This student Code is exist already!";
                             }
                         }else{
-                            echo "Problem";
-                        }
-                        
+                            $message = "Student code problem";
+                        }                    
                     }
 
                     if(empty($_POST["first_name"])){
@@ -110,15 +111,16 @@
                     }else{
                         $course_id = $_POST["course_id"];
                     }
-                    if(!$student_code == "" and !$first_name == "" and !$last_name == "" and !$personal_email == "" and !$student_email == "" and !$phone_number == "" and !$address == "" and !$course_id == ""){
-                        echo $student_code, $first_name, $last_name, $personal_email, $student_email, $phone_number, $address, $course_id;
-                        $sendData = mysqli_query($conn,"INSERT INTO students (studentFirstName, studentLastName, studentCode, studentPhoto, studentEmail, studentPhoneNumber, studentAddress, courseID, studentDOB, studentStartDate)
-                        VALUES ('$first_name', '$last_name', '$student_code', '$photo', '$personal_email', '$student_email', '$phone_number', '$address', '$course_id', '$dob', now())");
+
+                    if(!$student_code == "" and !$first_name == "" and !$last_name == "" and !$personal_email == "" and !$phone_number == "" and !$address == "" and !$course_id == ""){
+                        $sendData = mysqli_query($conn,
+                        "INSERT INTO students (studentFirstName, studentLastName, studentCode, studentPhoto, studentEmail, studentPhoneNumber, studentAddress, courseID, studentDOB, studentStartDate)
+                        VALUES ('$first_name', '$last_name', '$student_code', '$photo', '$personal_email', '$phone_number', '$address', '$course_id', '$dob', now())");
                         if ($sendData){
-                            echo "<script> location.href='index.php'; </script>";
-                            exit;
+                            $message = "The new student has added to the database!";
+                            // exit;
                         }else{
-                            echo "Something wrong: \n" . mysqli_error($conn);
+                            $message = "Something wrong: \n" . mysqli_error($conn);
                         }
                     }
                 }
@@ -141,41 +143,46 @@
     <div class="w-[30%] h-fit items-center bg-sky-500 rounded-2xl py-10 px-5 border-1 sql-shadow">
 
     <form class="flex flex-col gap-0.5" action="addStudent.php" method="POST">
-        <h1 class="text-center text-4xl font-bold">Add new student</h1>
-        <label for="student_code">Student Code</label>
+        <h1 class="text-center text-4xl font-bold text-stone-100 mb-5">Add new student</h1>
+        <?php if($message){?>
+            <div >
+                <span class="flex align-middle items-center w-full h-12 bg-green-500 text-xl rounded-xl justify-center text-stone-100 mb-5"><?php echo $message ?></span>
+            </div>
+        <?php } ?>
+        <label class="text-lg text-stone-100 mt-3" for="student_code">Student Code</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $studentIdErr;?></span><br>
         <input class="h-10 rounded-lg text-lg px-2" type="text" name="student_code" id="student_code" value=<?php echo $student_code ?>></br>
 
-        <label for="first_name">First name</label>
+        <label class="text-lg text-stone-100 mt-3" for="first_name">First name</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $firstNameErr;?></span><br>
         <input class="h-10 rounded-lg text-lg px-2" type="text" name="first_name" id="first_name" value=<?php echo $first_name ?>></br>
 
-        <label for="last_name">Last name</label>
+        <label class="text-lg text-stone-100 mt-3" for="last_name">Last name</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $lastNameErr;?></span><br>
         <input class="h-10 rounded-lg text-lg px-2" type="text" name="last_name" id="last_name" value=<?php echo $last_name ?>></br>
 
-        <label for="dob">Date of birth</label>
+        <label class="text-lg text-stone-100 mt-3" for="dob">Date of birth</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $dobErr;?></span><br>
         <input class="h-10 rounded-lg text-lg px-2" type="date" name="dob" id="dob" value=<?php echo $dob ?>></br>
 
-        <label for="personal_email">Personal email</label>
+        <label class="text-lg text-stone-100 mt-3" for="personal_email">Personal email</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $personalEmailErr;?></span><br>
         <input class="h-10 rounded-lg text-lg px-2" type="text" name="personal_email" id="personal_email" value=<?php echo $personal_email ?>></br>
 
-        <label for="phone_number">Phone number</label>
+        <label class="text-lg text-stone-100 mt-3" for="phone_number">Phone number</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $phoneNumberErr;?></span><br>
         <input class="h-10 rounded-lg text-lg px-2" type="text" name="phone_number" id="phone_number" value=<?php echo $phone_number ?>></br>
 
-        <label for="address">Address</label>
+        <label class="text-lg text-stone-100 mt-3" for="address">Address</label>
         <span class="text-red-600 text-sm font-bold"> <?php echo $addressErr;?></span><br>
         <input class="h-10 rounded-lg text-lg px-2" type="text" name="address" id="address" value=<?php echo $address ?>></br>
 
-        <label for="course_id">Course ID</label>
+        <label class="text-lg text-stone-100 mt-3" for="course_id">Course ID</label>
         <select class="h-10 rounded-lg text-lg px-2" name="course_id" id="course_id"> 
         <?php
         foreach($courseData as $row){
         ?>
-            <option value=<?php echo $row["courseCode"]; ?>>
+            <option value=<?php echo $row["courseID"]; ?>>
               <?php echo $row["courseCode"] . " | " . $row["courseName"]; ?>
             </option>
           <?php
