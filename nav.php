@@ -47,6 +47,9 @@
                     <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="addStudent.php">Add new student</a>
                 </li>
             <?php }} ?>
+            <li>
+                <a class="font-bolder text-stone-900 hover:font-bold hover:text-stone-700" href="about.php">About</a>
+            </li>
         <?php
             if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
                 ?>
