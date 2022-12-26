@@ -5,6 +5,7 @@
 <?php
 
   if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+    if($_SESSION["adminPos"] != 4){
 include_once 'database.php';
 
 // $student = mysqli_query($conn, "SELECT * FROM students");
@@ -80,7 +81,9 @@ $i++;
 </div>
 </div>
 <?php }else{ ?>
-  <div>You are not logged in. You do not have right to see this page</div>
+      <div class="flex w-screen h-full justify-center items-center text-3xl text-red-900">You are not authorized to use this page!</div>
+<?php }}else{ ?>
+  <div class="flex w-screen h-full justify-center items-center text-3xl text-red-900">You are not logged in. You do not have permission to see this page</div>
 <?php } ?>
 <div><?php @ require_once ("footer.php"); ?></div>
 </div>
