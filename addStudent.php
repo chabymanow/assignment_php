@@ -4,6 +4,7 @@
     <div class="flex flex-col flex-grow">
         <?php
         if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+            if($_SESSION["adminPos"] == 3){
             include_once 'database.php';
             include "generator.php";
 
@@ -125,11 +126,7 @@
                     }
                 }
             }
-         } ?>
-
-<?php
-    
-
+        
     $courses = mysqli_query($conn, "SELECT * FROM courses");
 
     $courseData = array();
@@ -193,5 +190,10 @@
         <input class="submit px-4 py-2 text-stone-100 text-lg bg-gradient-to-br from-sky-600 to-sky-800 rounded-xl mt-3 cursor-pointer shadow-gray-900 shadow-md hover:text-stone-200 hover:font-semibold hover:shadow-sm hover:shadow-gray-700" type="submit" name="submit" value="Add student" />
     </form>
     </div>
+<?php }else{ ?>
+    <div class="flex w-screen h-full justify-center items-center text-3xl text-red-900">You are not authorized to use this page! </div>
+<?php }}else{ ?>
+    <div class="flex w-screen h-full justify-center items-center text-3xl text-red-900">You are not logged in. Please login to use this page! </div>
+<?php } ?>
 </div>
 <div><?php @ require_once ("footer.php"); ?></div>

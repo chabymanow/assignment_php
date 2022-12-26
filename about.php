@@ -2,8 +2,8 @@
 <div class="flex flex-col h-screen">
 <div><?php include "header.php"; ?></div>
 <div class="flex flex-col flex-grow w-screen">
-    <div class="flex flex-col w-[90%] justify-between self-center
-    lg:flex-row lg:v-[70%] lg:max-w-[1536px]">
+    <div class="flex flex-col w-[90%] justify-center self-center
+    lg:flex-row lg:v-[70%] lg:max-w-[1536px] lg:justify-between">
         <div class="flex flex-col w-screen justify-center
         lg:w-[45%]">
             <?php

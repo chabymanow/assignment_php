@@ -4,6 +4,7 @@
     <div class="flex flex-col flex-grow justify-center">
         <?php
         if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+            if($_SESSION["adminPos"] != 4){
   ?>
   <div class="sql-shadow p-5 w-[80%] bg-sky-100 self-center word-break: break-all overflow-scroll ">
     <pre class="w-[100%] flex word-break: break-all">
@@ -568,7 +569,9 @@ insert into roles (role_pos, role_desc) values
 </pre>
 </div>
 <?php }else{ ?>
-    <div>You are not logged in. You do not have right to see this page</div>
+    <div class="flex w-screen h-full justify-center items-center text-3xl text-red-900">You are not authorized to use this page! </div>
+<?php }}else{ ?>
+    <div class="flex w-screen h-full justify-center items-center text-3xl text-red-900">You are not logged in. You do not have right to see this page</div>
     <?php } ?>
 </div>
     <div><?php @ require_once ("footer.php"); ?></div>
