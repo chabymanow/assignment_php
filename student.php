@@ -7,9 +7,14 @@
         include_once 'database.php';
         include "generator.php";
 
-        // echo generateView($_GET['varname']);
-        $var_value = $_GET['varname'];
-        $student = generateView($_GET['varname']);
+        if($_SESSION["adminPos"] != 4){
+            $var_value = $_GET['varname'];
+            $student = generateView($_GET['varname']);
+        }else{
+            $var_value = $_SESSION["id"];
+            $student = generateView($_SESSION["id"]);
+        }
+        
 ?>
 <div class="w-[80%] flex flex-row gap-5 self-center">
     <?php
@@ -17,7 +22,7 @@
         while($row = mysqli_fetch_array($student)) { 
             $course = $row["courseID"];
             $exams = mysqli_query($conn, "SELECT * FROM exams WHERE courseID = '$course'");
-            $timeTable = generateTimetable($_GET['varname']);
+            $timeTable = generateTimetable($var_value);
             $examRes = mysqli_query($conn, "SELECT * FROM exam_results WHERE studentID = '$var_value'");
             $examResLong = mysqli_num_rows($examRes);
             
